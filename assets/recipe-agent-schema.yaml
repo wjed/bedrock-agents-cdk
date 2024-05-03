@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  title: Recipe Automation API
+  version: 1.0.0
+  description: APIs for fetching recipes from budget bytes
+paths:
+  /recipe:
+    get:
+      summary: Get a recipe from budget bytes
+      description: Retrieve a recipe from budgetbytes.com. Only use this when explicitly asked
+      operationId: getRecipe
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipeSearch:
+                  type: string
+                  description: A search string of the recipe to look for on budget bytes.
+              required:
+                - recipeSearch
+      responses:
+        '200':
+          description: Retrieve a recipe from budgetbytes.com. Only use this when explicitly asked
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    url:
+                      type: string
+                      description: The URL of the recipe.
+                    ingredients:
+                      type: string
+                      description: The string of ingredients needed for the recipe.
+                    instructions:
+                      type: string
+                      description: The instructions about how to make the recipe
