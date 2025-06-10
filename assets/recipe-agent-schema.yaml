@@ -1,14 +1,14 @@
 openapi: 3.0.0
 info:
-  title: Recipe Automation API
+  title: AWS Certification Assistant API
   version: 1.0.0
-  description: APIs for fetching recipes from budget bytes
+  description: APIs for fetching AWS Cloud Practitioner study resources
 paths:
-  /recipe:
+  /study:
     get:
-      summary: Get a recipe from budget bytes
-      description: Retrieve a recipe from budgetbytes.com. Only use this when explicitly asked
-      operationId: getRecipe
+      summary: Get a study resource from AWS
+      description: Retrieve a study resource for the AWS Cloud Practitioner exam. Only use this when explicitly asked
+      operationId: getStudyResource
       requestBody:
         required: true
         content:
@@ -16,14 +16,14 @@ paths:
             schema:
               type: object
               properties:
-                recipeSearch:
+                topicSearch:
                   type: string
-                  description: A search string of the recipe to look for on budget bytes.
+                  description: A search string describing the AWS certification topic to look for.
               required:
-                - recipeSearch
+                - topicSearch
       responses:
         '200':
-          description: Retrieve a recipe from budgetbytes.com. Only use this when explicitly asked
+          description: Retrieve a study resource from AWS. Only use this when explicitly asked
           content:
             application/json:
               schema:
@@ -33,10 +33,10 @@ paths:
                   properties:
                     url:
                       type: string
-                      description: The URL of the recipe.
-                    ingredients:
+                      description: The URL of the study material.
+                    title:
                       type: string
-                      description: The string of ingredients needed for the recipe.
-                    instructions:
+                      description: The title of the study resource.
+                    summary:
                       type: string
-                      description: The instructions about how to make the recipe
+                      description: A short summary of the resource

@@ -8,20 +8,20 @@ Input from Bedrock Agent looks like
     "messageVersion": "1.0",
     "agent": {
         "alias": "TSTALIASID",
-        "name": "budget-bytes-getter",
+    "name": "aws-cert-study-getter",
         "version": "DRAFT",
         "id": "HR4FHXL0RQ",
     },
     "sessionId": "855290146028435",
     "sessionAttributes": {},
     "promptSessionAttributes": {},
-    "inputText": "What's a good recipe for pancakes?",
-    "apiPath": "/recipe",
+    "inputText": "What's a good study resource for IAM?",
+    "apiPath": "/study",
     "requestBody": {
         "content": {
             "application/json": {
                 "properties": [
-                    {"name": "recipeSearch", "type": "string", "value": "pancakes"}
+                    {"name": "topicSearch", "type": "string", "value": "IAM"}
                 ]
             }
         }
@@ -38,42 +38,38 @@ def lambda_handler(event, context):
     search = event["requestBody"]["content"]["application/json"]["properties"][0][
         "value"
     ]
-    print(f"Searching on Budget bytes for {search}")
-    query = search.replace(" ", "+").lower().replace("recipe", "")
+    print(f"Searching AWS for {search}")
+    query = search.replace(" ", "+")
     # download the search results page
-    search_url = f"https://www.budgetbytes.com/?s={query}"
+    search_url = f"https://aws.amazon.com/search/?searchQuery={query}"
     response = requests.get(search_url, headers={"User-Agent": "curl/7.64.1"})
     text = response.text
     # grab the URL for the first search result
     soup = BeautifulSoup(text, "html.parser")
-    # the links are in the class archive-post-listing
-    recipe = soup.find("div", class_="archive-post-listing").find("a")["href"]
-    # if recipe is undefined, return an error
-    if recipe is None:
+    link = soup.find("a")
+    resource = link["href"] if link else None
+    # if resource is undefined, return an error
+    if resource is None:
         result = {
-            "url": "No recipe found",
-            "ingredients": "No recipe found",
-            "instructions": "No recipe found",
+            "url": "No resource found",
+            "title": "No resource found",
+            "summary": "No resource found",
         }
     else:
-        # download the html and then parse out the ingredients and instructions. Pretend that we're curl so that we get past cloudflare
-        response = requests.get(recipe, headers={"User-Agent": "curl/7.64.1"})
+        # download the html and then parse out the title and summary. Pretend that we're curl so that we get past any blocks
+        response = requests.get(resource, headers={"User-Agent": "curl/7.64.1"})
         text = response.text
         soup = BeautifulSoup(text, "html.parser")
-        ingredients = [
-            ingredient.text
-            for ingredient in soup.find_all("li", class_="wprm-recipe-ingredient")
-        ]
-        instructions = [
-            instruction.text
-            for instruction in soup.find_all("li", class_="wprm-recipe-instruction")
-        ]
+        title_tag = soup.find("title")
+        title = title_tag.text.strip() if title_tag else ""
+        paragraphs = [p.text.strip() for p in soup.find_all("p")][:5]
+        summary = " ".join(paragraphs)
 
         # Execute your business logic here. For more information, refer to: https://docs.aws.amazon.com/bedrock/latest/userguide/agents-lambda.html
         result = {
-            "url": recipe,
-            "ingredients": ingredients,
-            "instructions": instructions,
+            "url": resource,
+            "title": title,
+            "summary": summary,
         }
 
     response_body = {"application/json": {"body": json.dumps(result)}}
