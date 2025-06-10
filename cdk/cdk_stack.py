@@ -4,7 +4,7 @@ and https://github.com/trevorspires/Bedrock-Agents-Demo-Final
 as well as https://docs.aws.amazon.com/cdk/api/v2/python/aws_cdk.aws_bedrock/CfnAgent.html#aws_cdk.aws_bedrock.CfnAgent
 Note that you need to be using aws-cdk >= 2.140.0 since that's the first version that has aws_bedrock in it.
 
-This CDK stack is designed to build infrastructure for a Bedrock agent that can be used to search for recipes on the Budget Bytes website.
+This CDK stack is designed to build infrastructure for a Bedrock agent that can be used to search for AWS Cloud Practitioner study resources.
 """
 
 from aws_cdk import (
@@ -68,7 +68,7 @@ class CdkStack(Stack):
         agent_role = iam.Role(
             self,
             "AgentIamRole",
-            role_name="AmazonBedrockExecutionRoleForAgents_" + "budgetbytesAgent",
+            role_name="AmazonBedrockExecutionRoleForAgents_" + "awsCertAgent",
             assumed_by=iam.ServicePrincipal("bedrock.amazonaws.com"),
             description="Agent role created by CDK.",
         )
@@ -83,7 +83,7 @@ class CdkStack(Stack):
         with open("assets/recipe-agent-schema.yaml", "r") as file:
             schema = file.read()
         action_group = bedrock.CfnAgent.AgentActionGroupProperty(
-            action_group_name="recipeSearch",
+            action_group_name="studySearch",
             action_group_executor=bedrock.CfnAgent.ActionGroupExecutorProperty(
                 lambda_=lambda_function.function_arn
             ),
@@ -96,14 +96,14 @@ class CdkStack(Stack):
         # At long last, create the bedrock agent!
         cfn_agent = bedrock.CfnAgent(
             self,
-            "budgetbytesAgent",
-            agent_name="budgetbytesAgent",
+            "awsCertAgent",
+            agent_name="awsCertAgent",
             # the properties below are optional
             action_groups=[action_group],
             auto_prepare=True,
-            description="Chat and get recipes",
+            description="Chat and get AWS certification resources",
             foundation_model="anthropic.claude-3-haiku-20240307-v1:0",
-            instruction="You are a cooking recipe generation chatbot.",
+            instruction="You are an AWS certification study assistant.",
             agent_resource_role_arn=agent_role.role_arn,
         )
         """
@@ -112,8 +112,8 @@ class CdkStack(Stack):
         """
         cfn_agent_alias = bedrock.CfnAgentAlias(
             self,
-            "recipeAgentAlias",
-            agent_alias_name="recipeAgent",
+            "awsCertAgentAlias",
+            agent_alias_name="awsCertAgent",
             agent_id=cfn_agent.attr_agent_id,
         )
 

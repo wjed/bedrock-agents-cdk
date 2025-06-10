@@ -7,7 +7,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("--agent-id", required=True)
 parser.add_argument("--alias-id", required=True)
-parser.add_argument("--query", default="pancakes")
+parser.add_argument("--query", default="IAM basics")
 
 args = parser.parse_args()
 agent_id = args.agent_id
@@ -24,7 +24,7 @@ response = runtime_client.invoke_agent(
     agentId=agent_id,
     agentAliasId=alias_id,
     sessionId=session_id,
-    inputText=f"what's a good recipe for {query} from budget bytes?",
+    inputText=f"what's a good study resource for {query} about the AWS Cloud Practitioner exam?",
 )
 completion = ""
 # It's a response stream so this is how to extract the text
